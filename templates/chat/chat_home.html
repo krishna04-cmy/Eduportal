@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Chat - EduPortal{% endblock %}
+{% block nav_chat %}active{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/chat.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="chat-wrapper">
+
+    <div class="page-header">
+        <h2><i class="fa-solid fa-comments"></i> Messages</h2>
+        <p>Chat with students and teachers</p>
+    </div>
+
+    <div class="users-list">
+    {% if users_with_status %}
+        {% for item in users_with_status %}
+        <a href="/chat/{{ item.user.username }}/" class="user-card">
+            <div class="user-avatar">
+                <i class="fa-solid fa-user"></i>
+                {% if item.is_online %}
+                    <span class="status-dot online"></span>
+                {% else %}
+                    <span class="status-dot offline"></span>
+                {% endif %}
+            </div>
+            <div class="user-info">
+                <h5>{{ item.user.username }}</h5>
+                <p>
+                    {% if item.is_online %}
+                        <span class="online-text">Online</span>
+                    {% else %}
+                        <span class="offline-text">Offline</span>
+                    {% endif %}
+                </p>
+            </div>
+            <div class="chat-arrow">
+                <i class="fa-solid fa-chevron-right"></i>
+            </div>
+        </a>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <i class="fa-solid fa-comments"></i>
+            <p>No users found!</p>
+        </div>
+    {% endif %}
+</div>
+
+</div>
+{% endblock%}

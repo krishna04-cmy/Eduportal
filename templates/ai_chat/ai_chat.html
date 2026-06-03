@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}AI Assistant - EduPortal{% endblock %}
+{% block nav_ai_chat %}active{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/ai_chat.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="chat-wrapper">
+    <div class="page-header">
+        <h2><i class="fa-solid fa-robot"></i> AI Assistant</h2>
+        <p>Ask me anything about your studies!</p>
+    </div>
+
+    <div class="chat-box" id="chat-box">
+        {% for msg in messages %}
+        <div class="message user">
+            <div class="sender">You</div>
+            <div class="bubble">{{ msg.message }}</div>
+        </div>
+        <div class="message ai">
+            <div class="sender">AI Assistant</div>
+            <div class="bubble">{{ msg.response }}</div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <i class="fa-solid fa-robot"></i>
+            <p>Ask me anything! I'm here to help.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="input-area">
+        <input type="text" id="message-input" class="chat-input" placeholder="Ask a question..." autocomplete="off">
+        <button id="send-btn" class="send-btn">
+            <i class="fa-solid fa-paper-plane"></i> Send
+        </button>
+    </div>
+</div>
+
+<script>
+    const csrfToken = "{{ csrf_token }}";
+
+    document.getElementById('send-btn').onclick = sendMessage;
+    document.getElementById('message-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') sendMessage();
+    });
+
+    function sendMessage() {
+        const input = document.getElementById('message-input');
+        const message = input.value.trim();
+        if (!message) return;
+
+        const box = document.getElementById('chat-box');
+
+        // Clear empty state
+        const emptyState = box.querySelector('.empty-state');
+        if (emptyState) emptyState.remove();
+
+        // Show user message
+        box.innerHTML += `
+            <div class="message user">
+                <div class="sender">You</div>
+                <div class="bubble">${message}</div>
+            </div>
+            <div class="typing" id="typing">AI is typing...</div>
+        `;
+        box.scrollTop = box.scrollHeight;
+        input.value = '';
+
+        // Send to server
+        fetch('/ai_chat/send/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify({ message: message })
+        })
+        .then(res => res.json())
+        .then(data => {
+            const typing = document.getElementById('typing');
+            if (typing) typing.remove();
+
+            box.innerHTML += `
+                <div class="message ai">
+                    <div class="sender">AI Assistant</div>
+                    <div class="bubble">${data.response}</div>
+                </div>
+            `;
+            box.scrollTop = box.scrollHeight;
+        })
+        .catch(err => {
+            const typing = document.getElementById('typing');
+            if (typing) typing.remove();
+
+            box.innerHTML += `
+                <div class="message ai">
+                    <div class="sender">AI Assistant</div>
+                    <div class="bubble" style="background:#fef2f2; color:#dc2626;">Error! Please try again.</div>
+                </div>
+            `;
+            box.scrollTop = box.scrollHeight;
+        });
+    }
+
+    // Auto scroll
+    const box = document.getElementById('chat-box');
+    box.scrollTop = box.scrollHeight;
+</script>
+
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ post.title }} - EduPortal{% endblock %}
+{% block nav_blog %}active{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/blog.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="post-detail-card">
+    <div class="post-header">
+        {% if post.category %}
+            <span class="category-badge">{{ post.category.name }}</span>
+        {% endif %}
+        <span class="post-date">{{ post.created_at|date:"d M Y" }}</span>
+    </div>
+
+    <h2 class="post-detail-title">{{ post.title }}</h2>
+
+    <div class="post-meta">
+        <span><i class="fa-solid fa-user"></i> {{ post.author.username }}</span>
+        <span><i class="fa-solid fa-comment"></i> {{ comments.count }} Comments</span>
+    </div>
+
+    <div class="post-body">
+        {{ post.content|linebreaks }}
+    </div>
+
+    {% if request.user.is_staff %}
+    <div class="post-edit-actions">
+        <a href="/blog/{{ post.pk }}/edit/" class="btn-edit-full">
+            <i class="fa-solid fa-pen"></i> Edit Post
+        </a>
+        <a href="/blog/{{ post.pk }}/delete/" class="btn-delete-full"
+           onclick="return confirm('Delete this post?')">
+            <i class="fa-solid fa-trash"></i> Delete Post
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="comments-card">
+    <h5><i class="fa-solid fa-comments"></i> Comments ({{ comments.count }})</h5>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert-msg alert-success">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST" class="comment-form">
+        {% csrf_token %}
+        <textarea name="content" class="form-control"
+                  placeholder="Write a comment..."
+                  rows="3" required></textarea>
+        <button type="submit" class="btn-comment">
+            <i class="fa-solid fa-paper-plane"></i> Post Comment
+        </button>
+    </form>
+
+    <div class="comments-list">
+        {% if comments %}
+            {% for comment in comments %}
+            <div class="comment-item">
+                <div class="comment-header">
+                    <span class="comment-author">
+                        <i class="fa-solid fa-user"></i> {{ comment.author.username }}
+                    </span>
+                    <span class="comment-date">{{ comment.created_at|date:"d M Y" }}</span>
+                    {% if comment.author == request.user %}
+                        <a href="/blog/comment/{{ comment.pk }}/delete/"
+                           class="btn-comment-delete"
+                           onclick="return confirm('Delete comment?')">
+                            <i class="fa-solid fa-trash"></i>
+                        </a>
+                    {% endif %}
+                </div>
+                <p class="comment-content">{{ comment.content }}</p>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="no-comments">No comments yet — be the first!</p>
+        {% endif %}
+    </div>
+</div>
+
+<a href="/blog/" class="btn-back">
+    <i class="fa-solid fa-arrow-left"></i> Back to Blog
+</a>
+
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - EduPortal{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block content %}
+
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-icon blue">
+            <i class="fa-solid fa-users"></i>
+        </div>
+        <div class="stat-info">
+            <h3>Students</h3>
+            <p>{{ total_students }}</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green">
+            <i class="fa-solid fa-newspaper"></i>
+        </div>
+        <div class="stat-info">
+            <h3>Blog Posts</h3>
+            <p>{{ total_blog_posts }}</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon purple">
+            <i class="fa-solid fa-list-check"></i>
+        </div>
+        <div class="stat-info">
+            <h3>My Tasks</h3>
+            <p>{{ total_tasks }}</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon orange">
+            <i class="fa-solid fa-calendar-check"></i>
+        </div>
+        <div class="stat-info">
+            <h3>Attendance</h3>
+            <p>{{ total_attendance }}%</p>
+            <small>{{ current_month }}</small>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

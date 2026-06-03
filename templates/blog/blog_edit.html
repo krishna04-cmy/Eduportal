@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Post - EduPortal{% endblock %}
+{% block nav_blog %}active{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/blog.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h2><i class="fa-solid fa-pen"></i> Edit Post</h2>
+    <p>Update your blog post</p>
+</div>
+
+<div class="form-card">
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label class="form-label">
+                <i class="fa-solid fa-heading"></i> Title
+            </label>
+            <input type="text" name="title" class="form-control"
+                   value="{{ post.title }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">
+                <i class="fa-solid fa-folder"></i> Category
+            </label>
+            <select name="category" class="form-control">
+                <option value="">-- Select Category --</option>
+                {% for cat in categories %}
+                    <option value="{{ cat.id }}"
+                        {% if post.category and post.category.id == cat.id %}selected{% endif %}>
+                        {{ cat.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">
+                <i class="fa-solid fa-align-left"></i> Content
+            </label>
+            <textarea name="content" class="form-control"
+                      rows="8" required>{{ post.content }}</textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">
+                <i class="fa-solid fa-flag"></i> Status
+            </label>
+            <select name="status" class="form-control">
+                <option value="draft" {% if post.status == 'draft' %}selected{% endif %}>Draft</option>
+                <option value="published" {% if post.status == 'published' %}selected{% endif %}>Published</option>
+            </select>
+        </div>
+
+        <div class="edit-buttons">
+            <button type="submit" class="btn-add">
+                <i class="fa-solid fa-save"></i> Save Changes
+            </button>
+            <a href="/blog/" class="btn-cancel">
+                <i class="fa-solid fa-xmark"></i> Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

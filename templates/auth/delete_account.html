@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delete Account</title>
+    <link rel="stylesheet" href="/static/login.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Delete Account</h2>
+        <p>Are you sure? This cannot be undone!</p>
+
+        {% if messages %}
+            {% for message in messages %}
+                <p class="error">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" style="background:red;">Yes, Delete My Account</button>
+        </form>
+
+        <a href="/profile/">Cancel</a>
+    </div>
+</body>
+</html>

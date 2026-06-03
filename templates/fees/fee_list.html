@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Fee Plans - EduPortal{% endblock %}
+{% block nav_fees %}active{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/fees.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="fees-wrapper">
+
+    <div class="page-header">
+        <h2><i class="fa-solid fa-indian-rupee-sign"></i> Fee Plans</h2>
+        <p>Select a fee plan to pay</p>
+        <div class="page-actions">
+            {% if request.user.is_staff %}
+                <a href="/fees/add/" class="btn-create">
+                    <i class="fa-solid fa-plus"></i> Add Fee Plan
+                </a>
+                <a href="/fees/all-orders/" class="btn-orders">
+                    <i class="fa-solid fa-receipt"></i> All Orders
+                </a>
+            {% else %}
+                <a href="/fees/cart/" class="btn-cart-page">
+                    <i class="fa-solid fa-cart-shopping"></i> Cart
+                    {% if cart_count > 0 %}
+                        <span class="cart-badge">{{ cart_count }}</span>
+                    {% endif %}
+                </a>
+                <a href="/fees/orders/" class="btn-orders">
+                    <i class="fa-solid fa-receipt"></i> My Orders
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert-msg {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="plans-grid">
+        {% if fee_plans %}
+            {% for plan in fee_plans %}
+            <div class="plan-card">
+                <div class="plan-header">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                </div>
+                <h4>{{ plan.name }}</h4>
+                <p class="plan-desc">{{ plan.description }}</p>
+                <p class="plan-duration">
+                    <i class="fa-solid fa-clock"></i> {{ plan.duration }}
+                </p>
+                <div class="plan-amount">₹{{ plan.amount }}</div>
+
+                {% if request.user.is_staff %}
+                <div class="action-btns">
+                    <a href="/fees/{{ plan.pk }}/edit/" class="btn-edit">
+                        <i class="fa-solid fa-pen"></i> Edit
+                    </a>
+                    <a href="/fees/{{ plan.pk }}/delete/" class="btn-delete"
+                       onclick="return confirm('Delete this fee plan?')">
+                        <i class="fa-solid fa-trash"></i> Delete
+                    </a>
+                </div>
+                {% else %}
+                <a href="/fees/cart/add/{{ plan.pk }}/" class="btn-addcart">
+                    <i class="fa-solid fa-cart-shopping"></i> Add to Cart
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                <p>No fee plans available!</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

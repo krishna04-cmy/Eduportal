@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}To-Do List - EduPortal{% endblock %}
+{% block nav_todos %}active{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/todo.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="todo-wrapper">
+    <!-- Header -->
+    <div class="page-header">
+        <h2><i class="fa-solid fa-list-check"></i> My Tasks</h2>
+        <p>Manage your assignments and tasks</p>
+    </div>
+
+    <!-- Add Task Form -->
+    <div class="add-task-card">
+        <h5><i class="fa-solid fa-plus"></i> Add New Task</h5>
+        <form method="POST" action="/todos/add/">
+            {% csrf_token %}
+            <div class="add-task-row">
+                <input type="text" name="title" class="form-control" placeholder="Enter task title..." required>
+                <input type="text" name="description" class="form-control" placeholder="Description (optional)">
+                <button type="submit" class="btn-add">
+                    <i class="fa-solid fa-plus"></i> Add
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Search & Filter -->
+    <div class="filter-card">
+        <form method="GET" action="/todos/">
+            <div class="filter-row">
+                <input type="text" name="search" class="form-control" placeholder="Search tasks..." value="{{ search }}">
+                <select name="status" class="form-control">
+                    <option value="">All Tasks</option>
+                    <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+                </select>
+                <button type="submit" class="btn-search">
+                    <i class="fa-solid fa-search"></i> Search
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tasks List -->
+    <div class="tasks-container">
+        {% if messages %}        <!--Koi message hai? YES toh andar jao-->
+            {% for message in messages %}   <!--Har message ke liye loop chalao-->
+                <div class="alert-msg {% if message.tags == 'error' %}
+                     alert-error{% else %}alert-success{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if todos %}
+            {% for todo in todos %}
+            <div class="task-card {% if todo.status == 'completed' %}completed{% endif %}">
+                <div class="task-left">
+                    <a href="/todos/toggle/{{ todo.pk }}/" class="toggle-btn">
+                        {% if todo.status == 'completed' %}
+                            <i class="fa-solid fa-circle-check"></i>
+                        {% else %}
+                            <i class="fa-regular fa-circle"></i>
+                        {% endif %}
+                    </a>
+                    <div class="task-info">
+                        <h6>{{ todo.title }}</h6>
+                        {% if todo.description %}
+                            <p>{{ todo.description }}</p>
+                        {% endif %}
+                        <span class="task-date">{{ todo.created_at|date:"d M Y" }}</span>
+                    </div>
+                </div>
+                <div class="task-right">
+                    <span class="status-badge {% if todo.status == 'completed' %}badge-done{% else %}badge-pending{% endif %}">
+                        {{ todo.status|capfirst }}
+                    </span>
+                    <a href="/todos/edit/{{ todo.pk }}/" class="btn-edit">
+                        <i class="fa-solid fa-pen"></i>
+                    </a>
+                    <a href="/todos/delete/{{ todo.pk }}/" class="btn-delete" onclick="return confirm('Delete this task?')">
+                        <i class="fa-solid fa-trash"></i>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <i class="fa-solid fa-clipboard-list"></i>
+                <p>No tasks found! Add your first task above.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

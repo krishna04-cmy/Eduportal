@@ -1,0 +1,139 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}EduPortal{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<!-- Top Navbar -->
+<nav class="topnav">
+    <div class="nav-left">
+        <button id="sidebarToggle" class="sidebar-toggle">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+        <i class="fa-solid fa-graduation-cap"></i>
+        <span>EduPortal</span>
+    </div>
+    <div class="nav-right">
+        <span class="welcome-text">Welcome, {{ request.user.username }}!</span>
+    </div>
+</nav>
+
+<div class="layout">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-menu">
+
+            <p class="menu-label">MAIN</p>
+
+            <a href="/dashboard/" class="menu-item {% block nav_dashboard %}{% endblock %}">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/todos/" class="menu-item {% block nav_todos %}{% endblock %}">
+                <i class="fa-solid fa-list-check"></i>
+                <span>Todos</span>
+            </a>
+            <a href="/blog/" class="menu-item {% block nav_blog %}{% endblock %}">
+                <i class="fa-solid fa-blog"></i>
+                <span>Blog</span>
+            </a>
+            <a href="/fees/" class="menu-item {% block nav_fees %}{% endblock %}">
+                <i class="fa-solid fa-money-bill"></i>
+                <span>Fees</span>
+            </a>
+            {% if request.user.is_staff %}
+            <a href="/students/" class="menu-item {% block nav_students %}{% endblock %}">
+                <i class="fa-solid fa-users"></i>
+                <span>Students</span>
+            </a>
+            {% endif %}
+            <a href="/chat/" class="menu-item {% block nav_chat %}{% endblock %}">
+                <i class="fa-solid fa-comments"></i>
+                <span>Chat</span>
+            </a>
+            <a href="/appointments/" class="menu-item {% block nav_appointments %}{% endblock %}">
+                <i class="fa-solid fa-calendar-check"></i>
+                <span>Appointments</span>
+            </a>
+            <a href="/projects/" class="menu-item {% block nav_projects %}{% endblock %}">
+                <i class="fa-solid fa-diagram-project"></i>
+                <span>Projects</span>
+            </a>
+            <a href="/ai_chat/" class="menu-item {% block nav_ai_chat %}{% endblock %}">
+                <i class="fa-solid fa-robot"></i>
+                <span>AI Assistant</span>
+            </a>
+
+            <div class="sidebar-divider"></div>
+            <p class="menu-label">ACCOUNT</p>
+
+            <div class="menu-item has-dropdown" id="profileToggle">
+                <i class="fa-solid fa-user"></i>
+                <span>Profile</span>
+                <i class="fa-solid fa-chevron-down arrow"></i>
+            </div>
+            
+            <div class="submenu" id="profileSubmenu">
+                <a href="/profile/" class="submenu-item">
+                    <i class="fa-solid fa-user"></i> My Profile
+                </a>
+                <a href="/profile/edit/" class="submenu-item">
+                    <i class="fa-solid fa-pen"></i> Edit Profile
+                </a>
+                <a href="/change-password/" class="submenu-item">
+                    <i class="fa-solid fa-lock"></i> Change Password
+                </a>
+                <a href="/delete-account/" class="submenu-item text-danger-item">
+                    <i class="fa-solid fa-trash"></i> Delete Account
+                </a>
+            </div>
+
+            <div class="sidebar-divider"></div>
+
+            <a href="/logout/" class="menu-item logout-item">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+</div>
+
+<script>
+    const sidebar = document.querySelector('.sidebar');
+    const mainContent = document.querySelector('.main-content');
+    const toggleBtn = document.getElementById('sidebarToggle');
+
+    toggleBtn.addEventListener('click', function() {
+        sidebar.classList.toggle('expanded');
+        mainContent.classList.toggle('expanded');
+    });
+
+    document.getElementById('profileToggle').addEventListener('click', function() {
+        const submenu = document.getElementById('profileSubmenu');
+        const arrow = this.querySelector('.arrow');
+        submenu.classList.toggle('open');
+        arrow.classList.toggle('rotate');
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

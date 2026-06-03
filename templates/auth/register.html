@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - EduPortal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/register.css' %}">
+</head>
+<body>
+
+<div class="register-wrapper">
+    <div class="register-card">
+
+        <div class="logo-icon">
+            <i class="fa-solid fa-user-plus"></i>
+        </div>
+        <div class="logo-title">EduPortal</div>
+        <div class="logo-sub">Create your account</div>
+
+        <div class="badge-row">
+            <span class="role-badge">Admin</span>
+            <span class="role-badge">Teacher</span>
+            <span class="role-badge">Student</span>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="error-msg">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label class="form-label">
+                    <i class="fa-solid fa-user"></i> Username
+                </label>
+                <input type="text"
+                       name="username"
+                       class="form-control"
+                       placeholder="Enter your username"
+                       required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">
+                    <i class="fa-solid fa-envelope"></i> Email
+                </label>
+                <input type="email"
+                       name="email"
+                       class="form-control"
+                       placeholder="Enter your email"
+                       required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">
+                    <i class="fa-solid fa-lock"></i> Password
+                </label>
+                <input type="password"
+                       name="password1"
+                       class="form-control"
+                       placeholder="Enter your password"
+                       required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">
+                    <i class="fa-solid fa-lock"></i> Confirm Password
+                </label>
+                <input type="password"
+                       name="password2"
+                       class="form-control"
+                       placeholder="Confirm your password"
+                       required>
+            </div>
+
+            <button type="submit" class="btn-register">
+                REGISTER →
+            </button>
+
+        </form>
+
+        <hr class="divider">
+
+        <div class="login-link">
+            Already have an account?
+            <a href="/login/">Login here</a>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

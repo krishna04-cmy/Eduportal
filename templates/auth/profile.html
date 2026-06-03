@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Profile - EduPortal{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="profile-wrapper">
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert-msg alert-error">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Profile Card -->
+    <div class="profile-card">
+
+        <div class="profile-avatar">
+            <i class="fa-solid fa-user"></i>
+        </div>
+
+        <h2 class="profile-name">{{ user.username }}</h2>
+        <p class="profile-email">{{ user.email }}</p>
+        <p class="profile-joined">Joined: {{ user.date_joined|date:"d M Y" }}</p>
+
+        {% if user.is_staff %}
+            <span class="badge-admin">
+                <i class="fa-solid fa-shield"></i> Admin
+            </span>
+        {% else %}
+            <span class="badge-student">
+                <i class="fa-solid fa-user-graduate"></i> Student
+            </span>
+        {% endif %}
+
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="profile-actions">
+
+        <a href="/profile/edit/" class="action-item">
+            <div class="action-icon blue">
+                <i class="fa-solid fa-pen"></i>
+            </div>
+            <div class="action-text">
+                <h6>Edit Profile</h6>
+                <p>Update your information</p>
+            </div>
+            <i class="fa-solid fa-chevron-right action-arrow"></i>
+        </a>
+
+        <a href="/change-password/" class="action-item">
+            <div class="action-icon green">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <div class="action-text">
+                <h6>Change Password</h6>
+                <p>Update your password</p>
+            </div>
+            <i class="fa-solid fa-chevron-right action-arrow"></i>
+        </a>
+
+        <a href="/delete-account/"
+           onclick="return confirm('Are you sure you want to delete your account?')"
+           class="action-item danger">
+            <div class="action-icon red">
+                <i class="fa-solid fa-trash"></i>
+            </div>
+            <div class="action-text danger">
+                <h6>Delete Account</h6>
+                <p>Permanently delete account</p>
+            </div>
+            <i class="fa-solid fa-chevron-right action-arrow"></i>
+        </a>
+        
+    </div>
+
+</div>
+
+{% endblock %}

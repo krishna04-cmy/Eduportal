@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Appointments - EduPortal{% endblock %}
+{% block nav_appointments %}active{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/appointments.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    setTimeout(function() {
+        location.reload();
+    }, 5000);
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="appointments-wrapper">
+    <div class="page-header">
+        <h2><i class="fa-solid fa-calendar-check"></i> Appointments</h2>
+        <p>Manage all appointments</p>
+
+        {% if not request.user.is_staff %}
+        <a href="/appointments/book/" class="btn-book">
+            <i class="fa-solid fa-plus"></i> Book Appointment
+        </a>
+        {% endif %}
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="{% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="table-card">
+        {% if appointments %}
+        <table class="apt-table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Title</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                    {% if request.user.is_staff %}<th>Actions</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for apt in appointments %}
+                <tr>
+                    <td>{{ apt.student.username }}</td>
+                    <td><strong>{{ apt.title }}</strong><br><small style="color:#64748b;">{{ apt.description }}</small></td>
+                    <td>{{ apt.date }}</td>
+                    <td>{{ apt.time }}</td>
+                    <td>
+                        {% if apt.status == 'approved' %}
+                            <span class="badge-approved">Approved ✅</span>
+                        {% elif apt.status == 'rejected' %}
+                            <span class="badge-rejected">Rejected ❌</span>
+                        {% else %}
+                            <span class="badge-pending">Pending ⏳</span>
+                        {% endif %}
+                    </td>
+                    {% if request.user.is_staff %}
+                    <td>
+                        {% if apt.status == 'pending' %}
+                        <form method="POST" action="/appointments/{{ apt.pk }}/approve/" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-approve">✅ Approve</button>
+                        </form>
+                        <form method="POST" action="/appointments/{{ apt.pk }}/reject/" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-reject">❌ Reject</button>
+                        </form>
+                        {% else %}
+                            <span style="color:#64748b; font-size:12px;">{{ apt.admin_note }}</span>
+                        {% endif %}
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <div class="empty-state">
+                <i class="fa-solid fa-calendar"></i>
+                <p>No appointments yet!</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

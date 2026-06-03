@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Students - EduPortal{% endblock %}
+{% block nav_students %}active{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/students.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="students-wrapper">
+
+    <div class="page-header">
+        <h2><i class="fa-solid fa-users"></i> Students</h2>
+        <p>Manage all students</p>
+    </div>
+
+    {% if request.user.is_staff %}
+    <div style="margin-bottom:16px; text-align:right;">
+        <a href="/students/add/" class="btn-create">
+            <i class="fa-solid fa-plus"></i> Add Student
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- Search -->
+    <div class="filter-card">
+        <form method="GET" action="/students/">
+            <div class="filter-row">
+                <input type="text"
+                       name="search"
+                       class="form-control"
+                       placeholder="Search students..."
+                       value="{{ search }}">
+                <button type="submit" class="btn-search">
+                    <i class="fa-solid fa-search"></i> Search
+                </button>
+            </div>
+        </form>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert-msg {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="table-card">
+        {% if students %}
+        <table class="students-table">
+            <thead>
+                <tr>
+                    <th>Roll No</th>
+                    <th>Name</th>
+                    <th>Class</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Gender</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td><span class="roll-badge">{{ student.roll_number }}</span></td>
+                    <td><strong>{{ student.name }}</strong></td>
+                    <td>{{ student.class_name }}</td>
+                    <td>{{ student.email }}</td>
+                    <td>{{ student.phone }}</td>
+                    <td>{{ student.gender|capfirst }}</td>
+                    <td>
+                        <div class="action-btns">
+                            <a href="/students/{{ student.pk }}/" class="btn-view">
+                                <i class="fa-solid fa-eye"></i>
+                            </a>
+                            {% if request.user.is_staff %}
+                            <a href="/students/{{ student.pk }}/edit/" class="btn-edit">
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
+                            <a href="/students/{{ student.pk }}/delete/"
+                                class="btn-delete"
+                                onclick="return confirm('Delete this student?')">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <div class="empty-state">
+                <i class="fa-solid fa-users"></i>
+                <p>No students found! Add your first student.</p>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,86 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Orders - EduPortal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/fees.css' %}">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-left">
+        <i class="fa-solid fa-graduation-cap"></i>
+        <span>EduPortal</span>
+    </div>
+    <div class="nav-right">
+        <a href="/fees/" class="nav-link">
+            <i class="fa-solid fa-rupee-sign"></i> Fee Plans
+        </a>
+        <a href="/logout/" class="btn-logout">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </a>
+    </div>
+</nav>
+
+<div class="fees-wrapper">
+    <div class="page-header">
+        <h2><i class="fa-solid fa-receipt"></i> All Orders</h2>
+        <p>All students fee payments</p>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert-msg {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="table-card">
+        {% if orders %}
+        <table class="cart-table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Class</th>
+                    <th>Fee Plan</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td><strong>{{ order.student.name }}</strong></td>
+                    <td>{{ order.student.class_name }}</td>
+                    <td>{{ order.fee_plan.name }}</td>
+                    <td class="amount">₹{{ order.amount }}</td>
+                    <td>
+                        <span class="status-badge 
+                            {% if order.status == 'paid' %}badge-paid
+                            {% elif order.status == 'pending' %}badge-pending
+                            {% else %}badge-failed{% endif %}">
+                            {{ order.status|capfirst }}
+                        </span>
+                    </td>
+                    <td>{{ order.created_at|date:"d M Y" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <div class="empty-state">
+                <i class="fa-solid fa-receipt"></i>
+                <p>No orders yet!</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+</html>

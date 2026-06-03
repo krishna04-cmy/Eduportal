@@ -1,0 +1,161 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ project.title }} - EduPortal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/projects.css' %}">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-left">
+        <i class="fa-solid fa-graduation-cap"></i>
+        <span>EduPortal</span>
+    </div>
+    <div class="nav-right">
+        <span class="welcome-text">Welcome, {{ request.user.username }}!</span>
+    </div>
+</nav>
+
+<div class="projects-wrapper">
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="{% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+    <a href="/projects/" class="nav-link">
+        <i class="fa-solid fa-arrow-left"></i> Projects
+    </a>
+    {% if request.user.is_staff %}
+    <a href="/projects/{{ project.pk }}/task/add/" class="btn-create">
+        <i class="fa-solid fa-plus"></i> Add Task
+    </a>
+    {% endif %}
+</div>
+
+<!-- Project Info -->
+<div class="detail-card">
+
+    <!-- Project Info -->
+    <div class="detail-card">
+        <h2 style="color:#1e3a8a;">{{ project.title }}</h2>
+        <p style="color:#64748b; margin-top:8px;">{{ project.description }}</p>
+        <p class="project-deadline" style="margin-top:8px;">
+            <i class="fa-solid fa-calendar"></i> Deadline: {{ project.deadline }}
+        </p>
+        <p class="project-students" style="margin-top:4px;">
+            <i class="fa-solid fa-users"></i> Students:
+            {% for student in project.students.all %}
+                {{ student.username }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        {% if request.user.is_staff %} 
+        <div style="margin-top:12px; display:flex; gap:10px;">
+        <a href="/projects/{{ project.pk }}/edit/" class="btn-view">
+            <i class="fa-solid fa-pen"></i> Edit
+        </a>
+        <a href="/projects/{{ project.pk }}/delete/" 
+           class="btn-complete"
+           style="background:#dc2626;"
+           onclick="return confirm('Delete this project?')">
+            <i class="fa-solid fa-trash"></i> Delete
+        </a>
+    </div>
+    {% endif %}
+    </div>
+
+    <!-- Tasks -->
+    <div class="detail-card">
+        <h4><i class="fa-solid fa-list-check"></i> Tasks</h4>
+        {% if tasks %}
+        <table class="task-table">
+            <thead>
+                <tr>
+                    <th>Task</th>
+                    <th>Assigned To</th>
+                    <th>Deadline</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in tasks %}
+                <tr>
+                    <td>
+                        <strong>{{ task.title }}</strong>
+                        <br><small style="color:#64748b;">{{ task.description }}</small>
+                    </td>
+                    <td>{{ task.assigned_to.username }}</td>
+                    <td>{{ task.deadline }}</td>
+                    <td>
+                        {% if task.status == 'completed' %}
+                            <span class="badge-completed">Completed ✅</span>
+                        {% else %}
+                            <span class="badge-pending">Pending ⏳</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if task.status == 'pending' and task.assigned_to == request.user %}
+                        <form method="POST" action="/projects/task/{{ task.pk }}/complete/">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-complete">
+                                ✅ Mark Complete
+                            </button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <div class="empty-state">
+                <i class="fa-solid fa-list-check"></i>
+                <p>No tasks yet!</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- File Upload -->
+    <div class="detail-card">
+        <h4><i class="fa-solid fa-file"></i> Files</h4>
+        {% if not request.user.is_staff %}
+        <form method="POST" action="/projects/{{ project.pk }}/file/upload/" enctype="multipart/form-data" style="margin-bottom:16px;">
+            {% csrf_token %}
+            <div style="display:flex; gap:12px; align-items:center;">
+                <input type="file" name="file" class="form-control" accept=".pdf,.doc,.docx,.ppt,.pptx">
+                <button type="submit" class="btn-upload">
+                    <i class="fa-solid fa-upload"></i> Upload
+                </button>
+            </div>
+        </form>
+        {% endif %}
+        {% if files %}
+            {% for file in files %}
+            <div class="file-item">
+                <i class="fa-solid fa-file-pdf" style="color:#dc2626; font-size:20px;"></i>
+                <div>
+                    <a href="{{ file.file.url }}" target="_blank">{{ file.file.name }}</a>
+                    <br><small style="color:#64748b;">By {{ file.uploaded_by.username }} — {{ file.uploaded_at|date:"d M Y" }}</small>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <i class="fa-solid fa-file"></i>
+                <p>No files uploaded yet!</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+</html>
